@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with DeepSeek</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Chat with DeepSeek</h1>
+    <div id="chat-box">
+        <!-- 聊天记录将显示在这里 -->
+    </div>
+    <input type="text" id="user-input" placeholder="Type your message here...">
+    <button id="send-button">Send</button>
+
+    <script>
+        $(document).ready(function() {
+            $('#send-button').click(function() {
+                var userMessage = $('#user-input').val();
+                if (userMessage) {
+                    $('#chat-box').append('<p><strong>You:</strong> ' + userMessage + '</p>');
+                    $.ajax({
+                        url: '/ask',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({message: userMessage}),
+                        success: function(response) {
+                            $('#chat-box').append('<p><strong>Bot:</strong> ' + response.response + '</p>');
+                        },
+                        error: function(error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                    $('#user-input').val('');
+                } else {
+                    console.log("消息为空");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
