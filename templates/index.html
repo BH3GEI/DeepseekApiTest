@@ -5,38 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with DeepSeek</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        #user-input {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #send-button {
+            width: 25%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            animation: fadeIn 0.5s;
+        }
+        .user-message {
+            background-color: #e1f5fe;
+        }
+        .bot-message {
+            background-color: #f1f8e9;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
     <h1>Chat with DeepSeek</h1>
     <div id="chat-box">
         <!-- 聊天记录将显示在这里 -->
     </div>
-    <input type="text" id="user-input" placeholder="Type your message here...">
-    <button id="send-button">Send</button>
+    <input type="text" id="user-input" placeholder="在此输入您的消息...">
+    <button id="send-button">发送</button>
 
     <script>
         $(document).ready(function() {
-            $('#send-button').click(function() {
+            $('#send-button').click(sendMessage);
+            $('#user-input').keypress(function(e) {
+                if (e.which == 13) {
+                    sendMessage();
+                }
+            });
+
+            function sendMessage() {
                 var userMessage = $('#user-input').val();
                 if (userMessage) {
-                    $('#chat-box').append('<p><strong>You:</strong> ' + userMessage + '</p>');
+                    $('#chat-box').append('<div class="message user-message"><strong>您:</strong> ' + userMessage + '</div>');
                     $.ajax({
                         url: '/ask',
                         method: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({message: userMessage}),
                         success: function(response) {
-                            $('#chat-box').append('<p><strong>Bot:</strong> ' + response.response + '</p>');
+                            $('#chat-box').append('<div class="message bot-message"><strong>机器人:</strong> ' + response.response + '</div>');
+                            $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
                         },
                         error: function(error) {
-                            console.error('Error:', error);
+                            console.error('错误:', error);
                         }
                     });
                     $('#user-input').val('');
                 } else {
                     console.log("消息为空");
                 }
-            });
+            }
         });
     </script>
 </body>
